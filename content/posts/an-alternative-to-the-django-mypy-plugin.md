@@ -4,7 +4,7 @@ date = 2023-12-16T16:03:19+01:00
 draft = false
 showToc = true
 comments = true
-description = 'Or how to enhance your development experience'
+description = 'Or how to enhance your development experience in Django'
 hideSummary = false
 +++
 
@@ -13,6 +13,10 @@ typing support in mind. External projects raised typing support at a decent leve
 mainly tied with [`mypy`](https://mypy-lang.org/). In this article, I will go briefly over
 the current state of the Django typing ecosystem and provide a hopefully viable alternative
 to the current `mypy` plugin.
+
+TL;DR: [`django-autotyping`](https://github.com/Viicos/django-autotyping/) creates custom stubs
+for your application, providing a reliable alternative to the Django mypy plugin
+and enhancing the Django development experience.
 
 # The current state of Django typing
 
