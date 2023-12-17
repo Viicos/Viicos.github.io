@@ -1,7 +1,7 @@
 +++
 title = 'An Alternative to the Django Mypy Plugin'
 date = 2023-12-16T16:03:19+01:00
-draft = true
+draft = false
 showToc = true
 comments = true
 description = 'Or how to enhance your development experience'
