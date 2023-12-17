@@ -1,4 +1,4 @@
-baseURL = 'https://Viicos.github.io'
+baseURL = 'https://Viicos.github.io/'
 languageCode = 'en-us'
 title = 'Technical posts'
 theme = 'PaperMod'
@@ -29,5 +29,4 @@ appendFilePath = true
 lineNos = false
 codeFences = true
 guessSyntax = true
-# noClasses: false
 style = "monokai"
