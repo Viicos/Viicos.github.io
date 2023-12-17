@@ -1,0 +1,33 @@
+baseURL = 'https://Viicos.github.io'
+languageCode = 'en-us'
+title = 'Technical posts'
+theme = 'PaperMod'
+copyright = "© 2023 [Viicos](https://github.com/Viicos/)"
+
+[params]
+showReadingTime = true
+ShowShareButtons = true
+ShowCodeCopyButtons = true
+
+[params.HomeInfoParams]
+Title = "Latest blog posts"
+Content = "Mainly Python and Django"
+
+[[params.socialIcons]]
+name = "github"
+url = "https://github.com/Viicos/"
+
+[params.assets]
+disableHLJS = true
+
+[params.editPost]
+URL = "https//github.com"
+Text = "Source"
+appendFilePath = true
+
+[markup.highlight]
+lineNos = false
+codeFences = true
+guessSyntax = true
+# noClasses: false
+style = "monokai"
