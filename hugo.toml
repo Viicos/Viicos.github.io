@@ -21,7 +21,7 @@ url = "https://github.com/Viicos/"
 disableHLJS = true
 
 [params.editPost]
-URL = "https//github.com"
+URL = "https://github.com/Viicos/Viicos.github.io/tree/main/content"
 Text = "Source"
 appendFilePath = true
 
