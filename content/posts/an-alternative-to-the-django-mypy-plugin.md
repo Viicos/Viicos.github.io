@@ -11,13 +11,13 @@ hideSummary = false
 Django being created way before type hints were a thing in Python, it wasn't designed with
 typing support in mind. External projects raised typing support at a decent level, but are
 mainly tied with [`mypy`](https://mypy-lang.org/). In this article, I will go briefly over
-the current state of the Django typing ecosystem, and provide a hopefully viable alternative
+the current state of the Django typing ecosystem and provide a hopefully viable alternative
 to the current `mypy` plugin.
 
 # The current state of Django typing
 
 Without any external tool or external type definitions (a.k.a. [_type stubs_](https://typing.readthedocs.io/en/latest/source/stubs.html)), the type checker will do its best to infer the correct types,
-but will fail in most cases and you often end up with `Any`s.
+but will fail in most cases, and you often end up with `Any`s.
 
 The most common (and probably annoying) example appears when dealing with models and fields:
 
@@ -48,7 +48,7 @@ When accessing attributes of this model at runtime, the database type is mapped 
 But without any further information, the type checker will not be able to infer these types, and will instead
 understand `name` and `blog` as being instances of `CharField` and `ForeignKey`.
 
-To overcome this issue, the [TypedDjango](https://github.com/typeddjango/) organization provides [type stubs](https://github.com/typeddjango/django-stubs) alongside with a `mypy` plugin. Without going into much details, our previous issue
+To overcome this issue, the [TypedDjango](https://github.com/typeddjango/) organization provides [type stubs](https://github.com/typeddjango/django-stubs) along with a `mypy` plugin. Without going into much detail, our previous issue
 with field types can be solved by specifying the base [`Field`](https://docs.djangoproject.com/en/dev/ref/models/fields/#django.db.models.Field) class as being generic over the Python type. By giving the correct type hints to the `__set__` and `__get__` methods of the Django field descriptors, type checkers can natively infer the correct attribute type, even
 if a `Field` instance was defined initially on the model.
 
@@ -63,7 +63,7 @@ class CharField(Field[str]): ...
 ```
 
 However, this will not be enough when dealing with related fields such as [`ForeignKey`](https://docs.djangoproject.com/en/dev/ref/models/fields/#django.db.models.ForeignKey), as the actual `__get__` return type depends on what the actual
-foreign model is. To support this use case, we can define the `__init__` method like so:
+foreign model is. To support this use case, we can define the `__init__` method like this:
 
 ```python
 class ForeignKey(Field[T]):
@@ -87,7 +87,7 @@ with a nice set of Django specific features (e.g. type checking for lookup queri
 # The drawbacks of using the mypy plugin
 
 Using a type checker can be beneficial to catch errors that would usually result in unhandled exceptions at runtime.
-To get immediate feedback of these errors alongside with the inferred types of your code, the type checker can
+To get immediate feedback on these errors along with the inferred types of your code, the type checker can
 be hooked up in your IDE via a [LSP](https://microsoft.github.io/language-server-protocol/) integration (for VSCode users, this is what Pylance is essentially doing).
 
 Does this mean we can get all the nice auto-completions and features provided by `mypy` and the Django plugin?
@@ -100,11 +100,11 @@ they seem to be lacking features that I really enjoy as a VSCode/Pylance user [^
 # Dynamic stubs to the rescue
 
 As `pyright` doesn't provide any plugin ability, I needed to find a solution that would ideally:
-- Be agnostic from any type checker, that is only using the existing Python typing logic.
+- Be agnostic of any type checker, that is only using the existing Python typing logic.
 - Avoid having to manually annotate your code.
 
-To implemented these lacking features, I created [`django-autotyping`](https://github.com/Viicos/django-autotyping/),
-a tool that can also be used a Django development application, that provides the features described below.
+To implement these lacking features, I created [`django-autotyping`](https://github.com/Viicos/django-autotyping/),
+a tool that can also be used as a Django development application that provides the features described below.
 
 The first idea that came to mind was writing a code transformer that would go over files and explicitly
 annotate fields where necessary. Using the previous code example, it would produce the following (assuming the two models live in different apps):
@@ -196,7 +196,7 @@ class Manager(Generic[T]):
 Instead of the unhelpful `filter(*args, **kwargs)` signature, you actually get the available lookups for this model
 (which can be of great help for beginners) [^3].
 
-There's many place where this could be useful: `__init__` signature of models, various methods of querysets, etc.
+There's many places where this could be useful: the `__init__` signature of models, various methods of querysets, etc.
 
 # Is this the perfect solution?
 
@@ -206,7 +206,7 @@ I would love to think it is. But there are still things to take into account.
 
 [LibCST](https://github.com/Instagram/LibCST/) being mainly written in Python, generating stub files can get slow
 for bigger projects. Testing on a Django application with a hundred models or so, generating the necessary
-overloads for the foreign fields takes about 30 seconds.
+overloads for the foreign fields takes around 30 seconds.
 
 Generating the stub files is something you only need to do after a Django migration though. If this becomes too much of an issue, I might have to consider switching to a faster AST/CST transformer ([Ruff](https://docs.astral.sh/ruff/) might be suitable).
 
@@ -222,7 +222,7 @@ the use case of reverse relationships:
 blog.blogpost_set  # Or with a custom attribute name, by specifying `related_name`
 ```
 
-To have the type checker aware of this attribute, you have to explicitly annotate the `Blog` class:
+To make the type checker aware of this attribute, you have to explicitly annotate the `Blog` class:
 
 ```python
 class Blog(models.Model):
@@ -235,15 +235,15 @@ Fortunately, a codemod can actually handle this for you (which I've yet to imple
 
 ## `django-stubs` is still tied to the mypy plugin
 
-Some parts of the `django-stubs` project are meant to be working only with the mypy plugin. A fork named [`django-types`](https://github.com/sbdchd/django-types/) was created a couple years ago, to make it easier to work with other type checkers. However, this fork is lagging behind.
+Some parts of the `django-stubs` project are meant to work only with the mypy plugin. A fork named [`django-types`](https://github.com/sbdchd/django-types/) was created a couple years ago, to make it easier to work with other type checkers. However, this fork is lagging behind.
 
-However, there is currently some work ongoing to merge the projects back together, and hopefully make `django-stubs` usable without the plugin [^4].
+However, there is currently some work ongoing to merge the projects back together and hopefully make `django-stubs` usable without the plugin [^4].
 
 ---
 
 For more details about how this can be used, you can follow the instructions on the [`django-autotyping`](https://github.com/Viicos/django-autotyping/) repository (which is still very much in progress). Using the tool is just a matter of adding an app to your `INSTALLED_APPS`.
 
-I believe there's a lot to explore with dynamic stubs. This can also be extended to other projects which makes heavy use
+I believe there's a lot to explore with dynamic stubs. This can also be extended to other projects that make heavy use
 of dynamic behavior.
 
 [^1]: While [`pyright`](https://github.com/microsoft/pyright/) -- the type checker from Microsoft used by Pylance -- is open source, it does not provide plugin functionnality. Regarding Pylance, the implementation isn't open source, so we can't really extend it with the same features as the mypy plugin. Besides, the plugin features we are trying to implement fit at the type checker level, not the LSP.
